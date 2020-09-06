@@ -18,7 +18,8 @@
             </ul>
             <a href="#" class="btn-card" (click)="ir()">Ir!</a>
             <span *ngIf="destino.isSelected()">
-                <span ngNonBindablbe>-PREFERIDO-</span>
+                <span ngNonBindablbe>{{PREFERIDO}}</span>
             </span>
+            <a [routerLink]="['/destino']">Ver Detalle</a>
         </div>    
 </div>
