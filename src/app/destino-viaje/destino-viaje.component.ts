@@ -16,7 +16,7 @@ export class DestinoViajeComponent implements OnInit {
     this.clicked = new EventEmitter();
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
   }
 
   ir(){

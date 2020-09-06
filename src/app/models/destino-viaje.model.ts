@@ -1,5 +1,5 @@
 export class DestinoViaje{
-    private selected: boolean;
+    public selected: boolean;
     public servicios: string[];
     
     constructor(public nombre: string, public u:string){  

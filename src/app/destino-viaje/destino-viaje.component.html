@@ -16,10 +16,10 @@
                     </span>
                 </li>
             </ul>
-            <a href="#" class="btn-card" (click)="ir()">Ir!</a>
+            <a href="#" class="btn-card" (click)="ir()">IR!</a>
             <span *ngIf="destino.isSelected()">
-                <span ngNonBindablbe>{{PREFERIDO}}</span>
+                <span ngNonBindable>{{ PREFERIDO! }}</span>
             </span>
-            <a [routerLink]="['/destino']">Ver Detalle</a>
+            <a [routerLink]="['/destino']">Ver!</a>
         </div>    
 </div>
