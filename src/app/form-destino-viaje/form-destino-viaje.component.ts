@@ -1,6 +1,9 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { DestinoViaje } from '../models/destino-viaje.model';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, Validators, ValidatorFn } from '@angular/forms';
+import { fromEvent } from 'rxjs';
+import { map, filter, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { ajax, AjaxResponse } from 'rxjs/ajax';
 
 @Component({
   selector: 'app-form-destino-viaje',
@@ -10,26 +13,61 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 export class FormDestinoViajeComponent implements OnInit {
   @Output() onItemAdded: EventEmitter<DestinoViaje>;
   fg: FormGroup;
+  minLongitud = 3;
+  searchResults: string[];
 
-  constructor(fg:FormBuilder) { 
-    this.onItemAdded= new EventEmitter();
-    this.fg=fg.group(
+  constructor(fg: FormBuilder) {
+    this.onItemAdded = new EventEmitter();
+    this.fg = fg.group(
       {
-        nombre:[''],
-        url:['']
+        nombre: ['', Validators.compose([
+          Validators.required,
+          this.nombreValidator,
+          this.nombreValidatorParametrizable(this.minLongitud)
+        ])],
+        url: ['']
       }
     );
-    this.fg.valueChanges.subscribe((form:any)=>{
+    this.fg.valueChanges.subscribe((form: any) => {
       console.log('Cambio el formulario:', form);
     });
   }
 
   ngOnInit() {
+    let elemNombre = <HTMLInputElement>document.getElementById('nombre');
+    fromEvent(elemNombre, 'input')
+      .pipe(
+        map((e: KeyboardEvent) => (e.target as HTMLInputElement).value),
+        filter(text => text.length > 2),
+        debounceTime(200),
+        distinctUntilChanged(),
+        switchMap(() => ajax('/assets/datos.json'))
+      ).subscribe(ajaxResponse => {
+        this.searchResults = ajaxResponse.response;
+      });
   }
 
-  guardar(nombre: string, url: string): boolean{
-    const d =  new DestinoViaje(nombre, url);
+  guardar(nombre: string, url: string): boolean {
+    const d = new DestinoViaje(nombre, url);
     this.onItemAdded.emit(d);
     return false;
+  }
+
+  nombreValidator(control: FormControl): { [s: string]: boolean } {
+    const l = control.value.toString().trim().length;
+    if (l > 0 && l < 5) {
+      return { invalidNombre: true };
+    }
+    return null;
+  }
+
+  nombreValidatorParametrizable(minLong: number): ValidatorFn {
+    return (control: FormControl): { [s: string]: boolean } | null => {
+      const l = control.value.toString().trim().length;
+      if (l > 0 && l < minLong) {
+        return { minLongNombre: true };
+      }
+      return null;
+    }
   }
 }
