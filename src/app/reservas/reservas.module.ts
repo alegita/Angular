@@ -1,3 +1,4 @@
+import { ReservasApiClientService } from './reservas-api-client.service';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -8,6 +9,9 @@ import { ReservasDetalleComponent } from './reservas-detalle/reservas-detalle.co
 
 @NgModule({
   declarations: [ReservasListadoComponent, ReservasDetalleComponent],
+  providers: [
+    ReservasApiClientService
+  ],
   imports: [
     CommonModule,
     ReservasRoutingModule
