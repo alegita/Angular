@@ -23,6 +23,7 @@ import { VuelosComponentComponent } from './components/vuelos/vuelos-component/v
 import { VuelosDetalleComponent } from './components/vuelos/vuelos-detalle-component/vuelos-detalle-component.component';
 import { VuelosMasInfoComponentComponent } from './components/vuelos/vuelos-mas-info-component/vuelos-mas-info-component.component';
 import { VuelosMainComponentComponent } from './components/vuelos/vuelos-main-component/vuelos-main-component.component';
+import { ReservasModule } from './reservas/reservas.module';
 
 export const childrenRoutesVuelos: Routes = [
   { path: '', redirectTo: 'main', pathMatch: 'full' },
@@ -90,6 +91,7 @@ export const APP_CONFIG = new InjectionToken<AppConfig>('app.config');
     NgRxStoreModule.forRoot(reducers, { initialState: reducersInitialState }),
     EffectsModule.forRoot([DestinosViajesEffects]),
     StoreDevtoolsModule.instrument(),
+    ReservasModule
   ],
   providers: [
     DestinosApiClient, AuthService, UsuarioLogueadoGuard
