@@ -3,12 +3,12 @@ import { DestinoViaje } from './../../models/destino-viaje.model';
 import { DestinosApiClient } from './../../models/destinos-api-client.model';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../app.module';
-import { ElegidoFavoritoAction, NuevoDestinoAction } from '../../models/destinos-viajes-state.model';
 
 @Component({
   selector: 'app-lista-destinos',
   templateUrl: './lista-destinos.component.html',
-  styleUrls: ['./lista-destinos.component.css']
+  styleUrls: ['./lista-destinos.component.css'],
+  providers: [DestinosApiClient]
 })
 export class ListaDestinosComponent implements OnInit {
   @Output() onItemAdded: EventEmitter<DestinoViaje>;
@@ -38,8 +38,7 @@ export class ListaDestinosComponent implements OnInit {
     this.destinosApiClient.elegir(e);
   }
 
-  getAll(){
-    
+  getAll(){    
   }
 
 }
