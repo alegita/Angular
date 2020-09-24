@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, InjectionToken } from '@angular/core';
+import { NgModule, InjectionToken, Injectable, APP_INITIALIZER } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StoreModule as NgRxStoreModule, ActionReducerMap, Store } from '@ngrx/store';
@@ -11,7 +11,7 @@ import { DestinoViajeComponent } from './components/destino-viaje/destino-viaje.
 import { ListaDestinosComponent } from './components/lista-destinos/lista-destinos.component';
 import { DestinoDetalleComponent } from './components/destino-detalle/destino-detalle.component';
 import { FormDestinoViajeComponent } from './components/form-destino-viaje/form-destino-viaje.component';
-import { DestinosViajesState, reducerDestinosViajes, initializeDestinosViajesState, DestinosViajesEffects } from './models/destinos-viajes-state.model';
+import { DestinosViajesState, reducerDestinosViajes, initializeDestinosViajesState, DestinosViajesEffects, InitMyDataAction } from './models/destinos-viajes-state.model';
 import { LoginComponent } from './components/login/login/login.component';
 import { ProtectedComponent } from './components/protected/protected/protected.component';
 import { UsuarioLogueadoGuard } from './guards/usuario-logueado/usuario-logueado.guard';
@@ -21,7 +21,21 @@ import { VuelosDetalleComponent } from './components/vuelos/vuelos-detalle-compo
 import { VuelosMasInfoComponentComponent } from './components/vuelos/vuelos-mas-info-component/vuelos-mas-info-component.component';
 import { VuelosMainComponentComponent } from './components/vuelos/vuelos-main-component/vuelos-main-component.component';
 import { ReservasModule } from './reservas/reservas.module';
+import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
 
+//app config
+export interface AppConfig {
+  apiEndpoint: String;
+}
+const APP_CONFIG_VALUE: AppConfig = {
+  apiEndpoint: 'http://localhost:3000'
+};
+export const APP_CONFIG = new InjectionToken<AppConfig>('app.config');
+
+//fin app config
+
+//init route
 export const childrenRoutesVuelos: Routes = [
   { path: '', redirectTo: 'main', pathMatch: 'full' },
   { path: 'main', component: VuelosMainComponentComponent },
@@ -46,6 +60,7 @@ const routes: Routes = [
     children: childrenRoutesVuelos
   }
 ];
+//end route
 
 //redux init
 export interface AppState {
@@ -59,12 +74,24 @@ const reducers: ActionReducerMap<AppState> = {
 let reducersInitialState = {
   destinos: initializeDestinosViajesState()
 };
+//end redux
 
-export interface AppConfig {
-  apiEndpoint: String;
+//app init
+export function init_app(appLoadService: AppLoadService): () => Promise<any> {
+  return () => appLoadService.intializeDestinosViajesState();
 }
 
-export const APP_CONFIG = new InjectionToken<AppConfig>('app.config');
+@Injectable()
+class AppLoadService{
+  constructor(private store: Store<AppState>, private http: HttpClient){}
+  async intializeDestinosViajesState(): Promise<any>{
+    const headers: HttpHeaders = new HttpHeaders({'x-API-TOKEN': 'token-seguridad'});
+    const req = new HttpRequest('GET', APP_CONFIG_VALUE.apiEndpoint + '/my', { headers: headers});
+    const response: any = await this.http.request(req).toPromise();
+    this.store.dispatch(new InitMyDataAction(response.body));
+  }
+}
+//end app init
 
 @NgModule({
   declarations: [
@@ -88,10 +115,14 @@ export const APP_CONFIG = new InjectionToken<AppConfig>('app.config');
     NgRxStoreModule.forRoot(reducers, { initialState: reducersInitialState }),
     EffectsModule.forRoot([DestinosViajesEffects]),
     StoreDevtoolsModule.instrument(),
-    ReservasModule
+    ReservasModule,
+    HttpClientModule
   ],
   providers: [
-    AuthService, UsuarioLogueadoGuard
+    AuthService, UsuarioLogueadoGuard,
+    {provide: APP_CONFIG, useValue: APP_CONFIG_VALUE },
+    AppLoadService, 
+    { provide: APP_INITIALIZER, useFactory: init_app, deps: [AppLoadService], multi: true },
   ],
   bootstrap: [AppComponent]
 })

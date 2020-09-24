@@ -5,6 +5,7 @@ import { DestinoViaje } from './../../models/destino-viaje.model';
 import { DestinosApiClient } from './../../models/destinos-api-client.model';
 import { ActivatedRoute } from '@angular/router';
 
+/*
 interface AppConfig {
   apiEndpoint: String;
 }
@@ -33,22 +34,24 @@ class DestinosApiClientViejo {
     return null;
   }
 }
+*/
 
 @Component({
   selector: 'app-destino-detalle',
   templateUrl: './destino-detalle.component.html',
   styleUrls: ['./destino-detalle.component.css'],
   providers: [
-    { provide: APP_CONFIG, useValue: APP_CONFIG_VALUE },
-    { provide: DestinosApiClient, useClass: DestinosApiClientDecorated },
-    { provide: DestinosApiClientViejo, useExisting: DestinosApiClient }
+    DestinosApiClient
+    //{ provide: APP_CONFIG, useValue: APP_CONFIG_VALUE },
+    //{ provide: DestinosApiClient, useClass: DestinosApiClientDecorated },
+    //{ provide: DestinosApiClientViejo, useExisting: DestinosApiClient }
   ]
 })
 
 export class DestinoDetalleComponent implements OnInit {
   destino: DestinoViaje;
 
-  constructor(public route: ActivatedRoute, public destinosApiClient: DestinosApiClientViejo) { }
+  constructor(public route: ActivatedRoute, public destinosApiClient: DestinosApiClient) { }//DestinosApiClientViejo) { }
 
   ngOnInit() {
     let id = this.route.snapshot.paramMap.get('id');
