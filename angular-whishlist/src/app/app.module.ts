@@ -23,6 +23,11 @@ import { VuelosMainComponentComponent } from './components/vuelos/vuelos-main-co
 import { ReservasModule } from './reservas/reservas.module';
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
+import Dexie from 'dexie';
+import { DestinoViaje } from './models/destino-viaje.model';
+import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
+import { Observable, from } from 'rxjs';
+import { flatMap } from 'rxjs/operators';
 
 //app config
 export interface AppConfig {
@@ -82,16 +87,81 @@ export function init_app(appLoadService: AppLoadService): () => Promise<any> {
 }
 
 @Injectable()
-class AppLoadService{
-  constructor(private store: Store<AppState>, private http: HttpClient){}
-  async intializeDestinosViajesState(): Promise<any>{
-    const headers: HttpHeaders = new HttpHeaders({'x-API-TOKEN': 'token-seguridad'});
-    const req = new HttpRequest('GET', APP_CONFIG_VALUE.apiEndpoint + '/my', { headers: headers});
+class AppLoadService {
+  constructor(private store: Store<AppState>, private http: HttpClient) { }
+  async intializeDestinosViajesState(): Promise<any> {
+    const headers: HttpHeaders = new HttpHeaders({ 'x-API-TOKEN': 'token-seguridad' });
+    const req = new HttpRequest('GET', APP_CONFIG_VALUE.apiEndpoint + '/my', { headers: headers });
     const response: any = await this.http.request(req).toPromise();
     this.store.dispatch(new InitMyDataAction(response.body));
   }
 }
 //end app init
+
+//dexie db
+export class Translation {
+  constructor(public id: number, public lang: string, public key: string, public value: string) { }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+
+export class MyDatabase extends Dexie {
+  destinos: Dexie.Table<DestinoViaje, number>;
+  translations: Dexie.Table<Translation, number>;
+  constructor() {
+    super('MyDatabase');
+    this.version(1).stores({
+      destinos: '++id, nombre, imagenUrl',
+    });
+    this.version(2).stores({
+      destinos: '++id, nombre, imagenUrl',
+      translations: '++id, lang, key, value'
+    });
+  }
+}
+
+export const db = new MyDatabase();
+//fin dexie db
+
+//i18n ini
+class TranslationLoader implements TranslateLoader {
+  constructor(private http: HttpClient) { }
+
+  getTranslation(lang: string): Observable<any> {
+    const promise = db.translations
+      .where('lang')
+      .equals(lang)
+      .toArray()
+      .then(results => {
+        if (results.length === 0) {
+          return this.http
+            .get<Translation[]>(APP_CONFIG_VALUE.apiEndpoint + '/api/translation?lang=' + lang)
+            .toPromise()
+            .then(apiResults => {
+              db.translations.bulkAdd(apiResults);
+              return apiResults;
+            });
+        }
+        return results;
+      }).then((traducciones) => {
+        console.log('traducciones cargadas');
+        console.log('traducciones');
+        return traducciones;
+
+      }).then((traducciones) => {
+        return traducciones.map((t) => ({ [t.key]: t.value }));
+      });
+
+    return from(promise).pipe(flatMap((elems) => from(elems)));
+  }
+}
+
+function HttpLoaderFactory(http: HttpClient) {
+  return new TranslationLoader(http);
+}
+//fin ini
 
 @NgModule({
   declarations: [
@@ -116,13 +186,21 @@ class AppLoadService{
     EffectsModule.forRoot([DestinosViajesEffects]),
     StoreDevtoolsModule.instrument(),
     ReservasModule,
-    HttpClientModule
+    HttpClientModule,
+    TranslateModule.forRoot({
+      loader:{
+        provide: TranslateLoader,
+        useFactory: (HttpLoaderFactory),
+        deps: [HttpClient]
+      }
+    })
   ],
   providers: [
     AuthService, UsuarioLogueadoGuard,
-    {provide: APP_CONFIG, useValue: APP_CONFIG_VALUE },
-    AppLoadService, 
+    { provide: APP_CONFIG, useValue: APP_CONFIG_VALUE },
+    AppLoadService,
     { provide: APP_INITIALIZER, useFactory: init_app, deps: [AppLoadService], multi: true },
+    MyDatabase
   ],
   bootstrap: [AppComponent]
 })
