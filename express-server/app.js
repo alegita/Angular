@@ -1,13 +1,20 @@
-var express = require("express");
+var express = require("express"), cors = require('cors');
 var app = express();
 app.use(express.json());
-app.listen(3000, () => console.log("server running on port 3000"));
+app.use(cors());
+app.listen(3000, () => console.log("Server running on port 3000"));
 
-app.get("/url", (req, res , next) => res.json(["Paris", "Barcelona", "Barranquilla", "Montevideo", "Santiago de Chile", "Nueva York"]));
-var misDestinos= [];
-app.get("/my", (req, res , next) => res.json(misDestinos));
-app.post("/my", (req, res , next) => {
-    console.log(req.body);
-    misDestinos = req.body;
-    res.json(misDestinos);
+var ciudades =["Paris", "Barcelona","Barranquilla", "Nueva York","Montevideo"];
+app.get("/ciudades", (req,res,next) => res.json(ciudades.filter((c) => c.toLowerCase().indexOf(req.query.q.toString().toLowerCase()) > -1)));
+
+var misDestinos = [];
+app.get("/my", (req, res, next)=> res.json(misDestinos));
+app.post("/my", (req, res, next) => {
+	console.log(req.body);
+	misDestinos.push(req.body.nuevo);
+	res.json(misDestinos);
 });
+
+app.get("/api/translation", (req, res, next) => res.json([
+	{lang: req.query.lang, key: 'HOLA', value: 'HOLA' + req.query.lang}
+]));
