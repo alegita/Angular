@@ -66,3 +66,4 @@ declare module "@angular/core" {
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */
+(window as any).global = window;
