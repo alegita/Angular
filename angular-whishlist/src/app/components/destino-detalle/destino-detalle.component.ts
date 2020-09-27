@@ -10,7 +10,7 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './destino-detalle.component.html',
   styleUrls: ['./destino-detalle.component.css'],
   providers: [DestinosApiClient],
-  styles: ['mgl-map { height: 75vh; width: 75vw; }']
+  styles: ['mgl-map { height: 50vh; width: 100vw; }']
 })
 
 export class DestinoDetalleComponent implements OnInit {
