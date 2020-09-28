@@ -26,7 +26,7 @@
             </a>
             {{destino.votes}}
         </div>
-        <a href="#" class="btn-card" (click)="ir()">IR!</a>
+        <a href="#" class="btn-card" (click)="ir()" appTrackearClick data-trackear-tags="destino_elegir_preferido lista_destinos_item">IR!</a>
         <span *ngIf="destino.isSelected()">
             <span ngNonBindable>{{ PREFERIDO! }}</span>
         </span>

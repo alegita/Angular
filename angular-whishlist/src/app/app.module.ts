@@ -31,6 +31,7 @@ import { Observable, from } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { EspiameDirective } from './espiame.directive';
+import { TrackearClickDirective } from './trackear-click.directive';
 
 //app config
 export interface AppConfig {
@@ -179,7 +180,8 @@ function HttpLoaderFactory(http: HttpClient) {
     VuelosMainComponentComponent,
     VuelosMasInfoComponentComponent,
     VuelosDetalleComponent,
-    EspiameDirective
+    EspiameDirective,
+    TrackearClickDirective
   ],
   imports: [
     BrowserModule,
