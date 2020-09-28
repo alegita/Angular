@@ -30,6 +30,7 @@ import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-transla
 import { Observable, from } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { EspiameDirective } from './espiame.directive';
 
 //app config
 export interface AppConfig {
@@ -177,7 +178,8 @@ function HttpLoaderFactory(http: HttpClient) {
     VuelosComponentComponent,
     VuelosMainComponentComponent,
     VuelosMasInfoComponentComponent,
-    VuelosDetalleComponent
+    VuelosDetalleComponent,
+    EspiameDirective
   ],
   imports: [
     BrowserModule,
