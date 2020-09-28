@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 export class DestinoViaje {
-    public selected: boolean;
+    private selected: boolean;
     public servicios: string[];
     public votes = 0;
     id = uuid();

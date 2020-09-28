@@ -15,7 +15,7 @@ export class ListaDestinosComponent implements OnInit {
   updates: string[];
   all;
 
-  constructor(public destinosApiClient: DestinosApiClient, public store: Store<AppState>) {
+  constructor(public destinosApiClient: DestinosApiClient, private store: Store<AppState>) {
     this.onItemAdded = new EventEmitter();
     this.updates = [];
     this.store.select(state => state.destinos.favorito)

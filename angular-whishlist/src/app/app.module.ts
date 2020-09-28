@@ -29,6 +29,7 @@ import { DestinoViaje } from './models/destino-viaje.model';
 import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
 import { Observable, from } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 //app config
 export interface AppConfig {
@@ -183,7 +184,12 @@ function HttpLoaderFactory(http: HttpClient) {
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forRoot(routes),
-    NgRxStoreModule.forRoot(reducers, { initialState: reducersInitialState }),
+    NgRxStoreModule.forRoot(reducers, { initialState: reducersInitialState,
+      runtimeChecks:{
+        strictStateImmutability: false,
+        strictActionImmutability: false,
+      } 
+    }),
     EffectsModule.forRoot([DestinosViajesEffects]),
     StoreDevtoolsModule.instrument(),
     ReservasModule,
@@ -195,7 +201,8 @@ function HttpLoaderFactory(http: HttpClient) {
         useFactory: (HttpLoaderFactory),
         deps: [HttpClient]
       }
-    })
+    }),
+    BrowserAnimationsModule
   ],
   providers: [
     AuthService, UsuarioLogueadoGuard,

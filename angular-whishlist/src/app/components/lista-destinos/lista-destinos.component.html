@@ -18,7 +18,8 @@
             *ngFor="let d of all; let i=index" 
             [destino]="d" 
             [idx]="i+1"
-            (clicked)='elegido(d)'></app-destino-viaje>
+            (clicked)="elegido(d)">
+        </app-destino-viaje>
     </div>
 
     <hr class="mb-5">
