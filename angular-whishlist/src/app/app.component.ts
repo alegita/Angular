@@ -20,9 +20,6 @@ export class AppComponent {
     translate.setDefaultLang('es');
   }
   
-  detinoAgregado(d){
-    //alert(d.nombre);
-  }
 }
 
 

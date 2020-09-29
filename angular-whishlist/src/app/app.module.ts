@@ -150,8 +150,8 @@ class TranslationLoader implements TranslateLoader {
         }
         return results;
       }).then((traducciones) => {
-        console.log('traducciones cargadas');
-        console.log('traducciones');
+        console.log('traducciones cargadas:');
+        console.log(traducciones);
         return traducciones;
 
       }).then((traducciones) => {
