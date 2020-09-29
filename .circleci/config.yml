@@ -1,0 +1,17 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/myapp/angular-wishlist
+    docker:
+      - image: circleci/node:latest-browsers
+    steps:
+      - checkout:
+          path: ~/myapp
+      - restore_cache:
+          key: tarea-m4-{{ .Branch }}-{{ checksum "package-lock.json" }}
+      - run: npm install
+      - save_cache:
+          key: tarea-m4-{{ .Branch }}-{{ checksum "package-lock.json" }}
+          paths:
+            - "node_modules"
+      - run: npm run test -- --progress=false --watch=false --browsers=ChromeHeadlessCI --source-map=false
